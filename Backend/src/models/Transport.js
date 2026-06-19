@@ -15,8 +15,8 @@ const transportSchema = new mongoose.Schema({
         required: true,
     },
     departureTime :{
-        type: Date,
-        required: true,
+        type: String,
+        required: true, 
     },
     arrivalTime : {
         type: String,

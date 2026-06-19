@@ -1,18 +1,37 @@
 const Booking = require('../models/Booking');
-const Trip = require('../models/Trip');
+// const Trip = require('../models/Trip');
+
+// booking history for user
+exports.getBookingHistory = async(req, res)=>{
+    try{
+        const bookings = await Booking.find({
+            userId: req.user._id,
+            status: {
+                $in: ['cancelled', 'completed']
+            }
+        }).populate({
+            path: 'transportId'
+        })
+        res.status(200).json({ bookings });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 
 // Create a new booking
 exports.createBooking = async(req, res) =>{
     try{
-        const {tripId} = req.body;
+        const {transportId, flightDetails, passengerDetails} = req.body;
 
-        if (!tripId) {
-            return res.status(400).json({ message: "Trip ID is required" });
+        if (!transportId && !flightDetails) {
+            return res.status(400).json({ message: " Transport ID or Flight Details are required" });
         }
 
         const booking = await Booking.create({
             userId: req.user._id,
-            tripId
+            transportId: transportId || null,
+            flightDetails: flightDetails || null,
+            passengerDetails
         });
 
         res.status(201).json({
@@ -26,11 +45,8 @@ exports.createBooking = async(req, res) =>{
 // Get bookings for a user
 exports.getMyBookings = async (req, res) =>{
     try{
-        const bookings = await Booking.find({userId: req.user._id}).populate({
-            path: 'tripId',
-            populate:{
-                path: 'transportId'
-            }
+        const bookings = await Booking.find({userId: req.user._id, status: "confirmed"}).populate({
+            path: 'transportId'
         })
 
         res.status(200).json({
@@ -45,11 +61,10 @@ exports.getMyBookings = async (req, res) =>{
 exports.cancelBooking = async(req, res) =>{
     try{
         const book = await Booking.findById(req.params.id);
-
         if(!book){
             return res.status(404).json({message: 'Booking not found'});
         }
-
+        
         // check ownership
         if(book.userId.toString() !== req.user._id.toString()){
             return res.status(403).json({message: 'Not authorized to cancel this booking'});

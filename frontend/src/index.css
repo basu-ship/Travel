@@ -124,3 +124,12 @@ html, body, #root {
   opacity: 1;
   transform: translateY(0);
 }
+/* Hide scrollbar but allow scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE */
+  scrollbar-width: none;     /* Firefox */
+}

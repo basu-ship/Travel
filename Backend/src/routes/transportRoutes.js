@@ -1,11 +1,8 @@
 const express = require('express');
-// const transportController = require('../controllers/transportController');
+const { searchAllTransports } = require('../controllers/transportController');
 
-const {searchTransports} = require('../controllers/transportController');
 const router = express.Router();
 
-// Search transports
-router.get('/',searchTransports);
+router.get('/search', searchAllTransports);
 
-
-module.exports = router
+module.exports = router;

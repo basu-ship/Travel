@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import bgImage from "../assets/bg.jpg";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -10,55 +10,83 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    if(!email || !password){
+      toast.error("Please fill all fields");
+      return;
+    }
     try {
       const res = await axios.post("http://localhost:5000/api/users/login", {
         email,
         password,
       });
-
       localStorage.setItem("token", res.data.token);
-      alert("Login successful!");
-      navigate("/serach");
+      toast.success("Login successful!");
+      navigate("/search"); 
     } catch (err) {
-      alert("Login failed");
+      console.log(err);
+      toast.error("Login failed");
     }
   };
 
   return (
-    <div
-  className="relative min-h-screen w-full flex items-center justify-center bg-cover bg-center"
-  style={{ backgroundImage: `url(${bgImage})` }}
->
-  {/* Dark overlay for better glass */}
-  <div className="absolute inset-0 bg-black/30"></div>
+    <div className="min-h-screen flex items-center justify-center 
+    bg-gradient-to-br from-[#0b1120] via-[#1f1408] to-[#020617]">
 
-  {/* Glass Card */}
-  <div className="relative backdrop-blur-xl bg-white/10 border border-white/20 p-10 rounded-3xl shadow-2xl w-[400px] text-white">
-    
-    <h2 className="text-3xl font-bold mb-6 text-center">Login</h2>
+      <div className="w-400px p-10 rounded-3xl 
+      bg-white/5 backdrop-blur-xl border border-white/10 
+      shadow-2xl text-white">
 
-    <input
-      type="email"
-      placeholder="Email"
-      className="w-full mb-4 p-3 bg-transparent border-b border-white outline-none placeholder-white caret-red focus:border-white/80"
-    />
+        <h1 className="text-center text-xl font-semibold text-yellow-300">
+          OnePass
+        </h1>
+        <div className="mb-6">
+          {/* email */}
+          <input
+            type="email"
+            placeholder="enter your email"
+            className="w-full bg-transparent border-b border-white/30 
+            py-2 outline-none focus:border-yellow-400"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
 
-    <input
-      type="password"
-      placeholder="Password"
-      className="w-full mb-6 p-3 bg-transparent border-b border-white outline-none placeholder-white caret-red focus:border-white/180"
-    />
+        <div className="mb-2">
+          {/* password */}
+          <input
+            type="password"
+            placeholder="enter your password"
+            className="w-full bg-transparent border-b border-white/30 
+            py-2 outline-none focus:border-yellow-400"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
 
-    <button className="w-full bg-white text-black py-2 rounded-full font-semibold hover:bg-gray-200 transition duration-300">
-      Log in
-    </button>
+        <div className="text-right text-sm text-gray-400 mb-6 cursor-pointer hover:text-yellow-400">
+          Forgot password?
+        </div>
 
-    <p className="text-sm text-center mt-4">
-      Don't have an account?{" "}
-      <span className="underline cursor-pointer">Register</span>
-    </p>
-  </div>
-</div>
+        <button
+          onClick={handleLogin}
+          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 
+          text-black py-3 rounded-full font-semibold 
+          hover:scale-105 transition duration-300"
+        >
+          Log in
+        </button>
+
+        <p className="text-center text-gray-400 text-sm mt-6">
+          Don't have an account?{" "}
+          <span 
+          onClick={()=> navigate("/register")}
+          className="text-yellow-400 cursor-pointer hover:underline">
+            Register
+          </span>
+        </p>
+
+      </div>
+    </div>
   );
 };
 

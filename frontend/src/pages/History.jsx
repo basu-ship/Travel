@@ -3,14 +3,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import jsPDF from "jspdf";
 
-const Bookings = () => {
+const History = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const fetchBookings = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/bookings", {
+      const res = await axios.get("http://localhost:5000/api/bookings/history", {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -21,26 +21,6 @@ const Bookings = () => {
       toast.error("Failed to fetch bookings");
     } finally {
       setLoading(false);
-    }
-  };
-  const handleCancelBooking = async (bookingId) => {
-    try {
-      const token = localStorage.getItem("token");
-
-      await axios.delete(
-        `http://localhost:5000/api/bookings/${bookingId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-      toast.success("Booking cancelled successfully");
-      fetchBookings();
-
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to cancel booking");
     }
   };
   useEffect(() => {
@@ -103,11 +83,11 @@ const Bookings = () => {
     ">
       {loading ? (
         <p className="text-gray-300 text-lg">
-          Loading your bookings...
+          Loading your History...
         </p>
       ) : bookings.length === 0 ? (
         <p className="text-gray-400 text-lg">
-          No bookings found 🚀
+          No history available 📜
         </p>
       ) : (
         <div className="w-full max-w-5xl grid gap-6">
@@ -142,33 +122,23 @@ const Bookings = () => {
                     Status: {booking.status}
                   </p>
                 </div>
-                {booking.status === "confirmed" && (
-                  <div className="flex flex-col gap-3">
-                    <button
-                      onClick={() => setSelectedTicket(booking)}
-                      className="bg-blue-500 hover:bg-blue-400
-                      text-white px-5 py-2 rounded-xl font-semibold transition"
-                    >
-                      Show Ticket
-                    </button>
-                    <button
-                      onClick={() => downloadTicket(booking)}
-                      className="bg-yellow-500 hover:bg-yellow-400
-                      text-black px-5 py-2 rounded-xl font-semibold transition"
-                    >
-                      Download Ticket
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleCancelBooking(booking._id)
-                      }
-                      className="bg-red-500 hover:bg-red-400
-                      text-white px-5 py-2 rounded-xl font-semibold transition"
-                    >
-                      Cancel Booking
-                    </button>
-                  </div>
-                )}
+                <div className="flex flex-col gap-3">
+  <button
+    onClick={() => setSelectedTicket(booking)}
+    className="bg-blue-500 hover:bg-blue-400
+    text-white px-5 py-2 rounded-xl font-semibold transition"
+  >
+    Show Ticket
+  </button>
+
+  <button
+    onClick={() => downloadTicket(booking)}
+    className="bg-yellow-500 hover:bg-yellow-400
+    text-black px-5 py-2 rounded-xl font-semibold transition"
+  >
+    Download Ticket
+  </button>
+</div>
               </div>
             );
           })}
@@ -284,4 +254,4 @@ const Bookings = () => {
   );
 };
 
-export default Bookings;
+export default History;

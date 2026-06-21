@@ -78,7 +78,8 @@ const Search = () => {
       const bookingData = transport._id
         ? {
             transportId: transport._id,
-            passengerDetails
+            passengerDetails,
+            journeyDate: transport.journeyDate // Include journeyDate for transport bookings
           }
         : {
             flightDetails: {
@@ -87,6 +88,7 @@ const Search = () => {
               flightNumber: transport.flightNumber,
               source: transport.source,
               destination: transport.destination,
+              journeyDate: transport.journeyDate,
               departureTime: transport.departureTime,
               arrivalTime: transport.arrivalTime,
               price: transport.price

@@ -18,6 +18,10 @@ const transportSchema = new mongoose.Schema({
         type: String,
         required: true, 
     },
+    journeyDate: {
+    type: Date,
+    required: true,
+    },
     arrivalTime : {
         type: String,
         required: true,

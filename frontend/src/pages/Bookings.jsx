@@ -7,6 +7,7 @@ const Bookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTicket, setSelectedTicket] = useState(null);
+
   const fetchBookings = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -23,6 +24,7 @@ const Bookings = () => {
       setLoading(false);
     }
   };
+
   const handleCancelBooking = async (bookingId) => {
     try {
       const token = localStorage.getItem("token");
@@ -37,20 +39,20 @@ const Bookings = () => {
       );
       toast.success("Booking cancelled successfully");
       fetchBookings();
-
     } catch (error) {
       console.log(error);
       toast.error("Failed to cancel booking");
     }
   };
+
   useEffect(() => {
     fetchBookings();
   }, []);
 
   const downloadTicket = (booking) => {
     const doc = new jsPDF();
-
-    const data = booking.transportId || booking.flightDetails;
+    const data = booking.transportId || booking.flightDetails || {};
+    
     doc.setFontSize(20);
     doc.text("OnePass Travel Ticket", 20, 20);
 
@@ -61,18 +63,19 @@ const Bookings = () => {
     doc.text(`Booking ID: ${booking._id}`, 20, 40);
     doc.text(
       `Transport: ${
-        booking.transportId?.type || booking.flightDetails?.type
+        booking.transportId?.type || booking.flightDetails?.transportType || "N/A"
       }`,
       20,
       50
     );
     doc.text(
-      `Route: ${data.source} to ${data.destination}`,
+      `Route: ${data.source || "N/A"} to ${data.destination || "N/A"}`,
       20,
       60
     );
-    doc.text(`Price: ₹${data.price}`, 20, 70);
+    doc.text(`Price: ₹${data.price || 0}`, 20, 70);
     doc.text(`Status: ${booking.status}`, 20, 80);
+    
     if (booking.flightDetails?.airline) {
       doc.text(`Airline: ${booking.flightDetails.airline}`, 20, 90);
     }
@@ -84,6 +87,13 @@ const Bookings = () => {
     }
     doc.save(`ticket-${booking._id}.pdf`);
   };
+
+  // Safe mapping configuration for the modal view
+  const ticketData =
+    selectedTicket?.transportId ||
+    selectedTicket?.flightDetails ||
+    {};
+
   return (
     <div
       className="
@@ -112,8 +122,8 @@ const Bookings = () => {
       ) : (
         <div className="w-full max-w-5xl grid gap-6">
           {bookings.map((booking) => {
-            const data =
-              booking.transportId || booking.flightDetails;
+            const data = booking.transportId || booking.flightDetails || {};
+            
             return (
               <div
                 key={booking._id}
@@ -125,7 +135,8 @@ const Bookings = () => {
                 <div>
                   <h2 className="text-2xl font-bold text-white capitalize">
                     {booking.transportId?.type ||
-                      booking.flightDetails?.type}
+                      booking.flightDetails?.transportType || 
+                      "Unknown Transport"}
                   </h2>
                   {booking.flightDetails?.airline && (
                     <p className="text-blue-300 mt-1">
@@ -133,10 +144,10 @@ const Bookings = () => {
                     </p>
                   )}
                   <p className="text-gray-300 mt-2">
-                    {data?.source} → {data?.destination}
+                    {data.source || "N/A"} → {data.destination || "N/A"}
                   </p>
                   <p className="text-yellow-400 font-semibold mt-2">
-                    ₹{data?.price}
+                    ₹{data.price || 0}
                   </p>
                   <p className="text-sm text-gray-400 mt-2">
                     Status: {booking.status}
@@ -178,28 +189,25 @@ const Bookings = () => {
       {selectedTicket && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-white text-black rounded-2xl p-8 w-[90%] max-w-[420px] shadow-2xl relative">
-
             <button
               onClick={() => setSelectedTicket(null)}
               className="absolute top-4 right-4 text-xl font-bold"
             >
               ×
             </button>
-            <h2 className="text-2xl font-bold mb-6 text-center">
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
               OnePass Travel Ticket
             </h2>
             <p>
               <strong>Booking ID:</strong> {selectedTicket._id}
             </p>
-            {/* Ticket Number */}
             <p>
               <strong>Ticket No:</strong>{" "}
               OTP-{selectedTicket._id.slice(-6).toUpperCase()}
             </p>
             <p>
               <strong>Transport:</strong>{" "}
-              {selectedTicket.transportId?.type ||
-                selectedTicket.flightDetails?.type}
+              {ticketData.type || ticketData.transportType || "N/A"}
             </p>
             {selectedTicket.flightDetails?.airline && (
               <p>
@@ -209,37 +217,18 @@ const Bookings = () => {
             )}
             <p>
               <strong>Route:</strong>{" "}
-              {
-                (
-                  selectedTicket.transportId ||
-                  selectedTicket.flightDetails
-                )?.source
-              }
-              {" → "}
-              {
-                (
-                  selectedTicket.transportId ||
-                  selectedTicket.flightDetails
-                )?.destination
-              }
+              {ticketData.source || "N/A"} → {ticketData.destination || "N/A"}
             </p>
             <p>
-              <strong>Price:</strong> ₹
-              {
-                (
-                  selectedTicket.transportId ||
-                  selectedTicket.flightDetails
-                )?.price
-              }
+              <strong>Price:</strong> ₹{ticketData.price || 0}
             </p>
-            {/* Passenger Details */}
+            
             {selectedTicket.passengerDetails && (
               <>
                 <p>
                   <strong>Passenger:</strong>{" "}
                   {selectedTicket.passengerDetails.fullName}
                 </p>
-
                 <p>
                   <strong>Age:</strong>{" "}
                   {selectedTicket.passengerDetails.age}
@@ -248,7 +237,6 @@ const Bookings = () => {
                   <strong>Gender:</strong>{" "}
                   {selectedTicket.passengerDetails.gender}
                 </p>
-
                 <p>
                   <strong>Phone:</strong>{" "}
                   {selectedTicket.passengerDetails.phone}
@@ -260,8 +248,6 @@ const Bookings = () => {
               <strong>Status:</strong>{" "}
               {selectedTicket.status}
             </p>
-
-            {/* Booking Date */}
             <p>
               <strong>Booked On:</strong>{" "}
               {new Date(
@@ -276,7 +262,6 @@ const Bookings = () => {
             >
               Download PDF
             </button>
-
           </div>
         </div>
       )}

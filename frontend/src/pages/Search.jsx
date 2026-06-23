@@ -38,13 +38,12 @@ const Search = () => {
     }
 
     try {
-      setLoading(true); // ✅ FIXED: Changed from loading(true) to setLoading(true) to prevent runtime crash
+      setLoading(true);
 
       const res = await axios.get(
         `http://localhost:5000/api/transports/search?source=${source}&destination=${destination}&type=${type}`
       );
 
-      // If your API returns the array directly, fallback to res.data
       setResults(res.data.transports || res.data.results || res.data || []);
 
     } catch (err) {
@@ -79,7 +78,7 @@ const Search = () => {
         ? {
             transportId: transport._id,
             passengerDetails,
-            journeyDate: transport.journeyDate // Include journeyDate for transport bookings
+            journeyDate: transport.journeyDate
           }
         : {
             flightDetails: {
@@ -108,7 +107,6 @@ const Search = () => {
 
       toast.success("Booking successful!");
 
-      // Reset Modal
       setSelectedTransport(null);
 
       setPassengerDetails({
@@ -129,6 +127,16 @@ const Search = () => {
   return (
     <div className="w-full min-h-screen px-4 py-16 flex flex-col items-center bg-gradient-to-br from-[#0b1120] via-[#1f1408] to-[#020617] font-sans antialiased selection:bg-yellow-500/30 selection:text-yellow-200">
       
+      {/* 1. HERO SECTION */}
+      <div className="w-full max-w-5xl text-center mb-10 mt-10">
+        <h1 className="text-5xl md:text-6xl font-black text-white mb-4">
+          Search Your Journey
+        </h1>
+        <p className="text-gray-400 text-lg">
+          Find buses, trains and flights for your next trip.
+        </p>
+      </div>
+
       {/* 🔥 SEARCH CARD */}
       <div className="w-full max-w-5xl backdrop-blur-xl bg-white/[0.06] border border-white/10 rounded-3xl p-6 md:p-8 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
         <div className="flex flex-col lg:flex-row gap-4 items-center">
@@ -196,6 +204,61 @@ const Search = () => {
             </button>
           </div>
 
+        </div>
+      </div>
+
+      {/* 2. FEATURES */}
+      <div className="w-full max-w-5xl mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+          <h3 className="text-yellow-400 text-xl">🛡️</h3>
+          <h4 className="text-white font-bold mt-3">Secure Booking</h4>
+          <p className="text-gray-400 text-sm mt-2">Safe and reliable payment system.</p>
+        </div>
+
+        <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+          <h3 className="text-yellow-400 text-xl">🎫</h3>
+          <h4 className="text-white font-bold mt-3">Easy Booking</h4>
+          <p className="text-gray-400 text-sm mt-2">Book tickets in a few clicks.</p>
+        </div>
+
+        <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+          <h3 className="text-yellow-400 text-xl">📞</h3>
+          <h4 className="text-white font-bold mt-3">24/7 Support</h4>
+          <p className="text-gray-400 text-sm mt-2">We're here whenever you need help.</p>
+        </div>
+
+        <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+          <h3 className="text-yellow-400 text-xl">💸</h3>
+          <h4 className="text-white font-bold mt-3">Fast Refund</h4>
+          <p className="text-gray-400 text-sm mt-2">Quick refund processing.</p>
+        </div>
+      </div>
+
+      {/* 3. POPULAR ROUTES */}
+      <div className="w-full max-w-5xl mt-12">
+        <h2 className="text-2xl font-bold text-white mb-5">Popular Routes</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          <button
+            onClick={() => {
+              setSource("Kolkata");
+              setDestination("Haldia");
+            }}
+            className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 text-left hover:border-yellow-500 transition"
+          >
+            <h3 className="text-white font-bold">Kolkata → Haldia</h3>
+            <p className="text-gray-400 text-sm">Most booked route</p>
+          </button>
+
+          <button
+            onClick={() => {
+              setSource("Kolkata");
+              setDestination("Durgapur");
+            }}
+            className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 text-left hover:border-yellow-500 transition"
+          >
+            <h3 className="text-white font-bold">Kolkata → Durgapur</h3>
+            <p className="text-gray-400 text-sm">Popular bus route</p>
+          </button>
         </div>
       </div>
 

@@ -6,7 +6,7 @@ const connnectDB = require('./config/db');
 const userRouter = require('./routes/userRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const transportRoutes = require('./routes/transportRoutes');
-
+const chatbotRoutes = require('./routes/chatbotRoutes')
 dotenv.config();
 
 const app = express();
@@ -23,6 +23,9 @@ app.use('/api/bookings', bookingRoutes);
 
 // transport routes
 app.use('/api/transports', transportRoutes);
+
+// chatbot routes
+app.use('/api/chatbot', chatbotRoutes);
 
 app.get('/', (req , res) =>{
     res.send("API is running!");

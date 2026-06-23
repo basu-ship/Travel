@@ -9,11 +9,12 @@ import ProdectedRoute from "./components/ProtectedRoute";
 import Register from "./pages/Registation";
 import History from "./pages/History";
 import { use } from "react";
-
+import ChatBot from "./components/ChatBot";
 
 function App() {
   const location  = useLocation();
   const hideNavbarPaths = ["/", "/login", "/register"];
+  const hideChatbotPaths = ["/"];
   return (
     <>
     {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
@@ -35,6 +36,9 @@ function App() {
         }
         />
     </Routes>
+      {!hideChatbotPaths.includes(location.pathname) && (
+        <ChatBot />
+      )}
     </>
   );
 }

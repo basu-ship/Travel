@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -25,6 +25,9 @@ const Search = () => {
     phone: ""
   });
 
+  // 🚀 REF FOR AUTOSCROLL
+  const resultsRef = useRef(null);
+
   // 🔄 Swap function
   const handleSwap = () => {
     setSource(destination);
@@ -45,6 +48,13 @@ const Search = () => {
       );
 
       setResults(res.data.transports || res.data.results || res.data || []);
+
+      // 🚀 SMOOTH SCROLL TO RESULTS CONTAINER
+      setTimeout(() => {
+        if (resultsRef.current) {
+          resultsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
 
     } catch (err) {
       console.log(err);
@@ -125,14 +135,11 @@ const Search = () => {
   };
 
   return (
-    <div className="w-full min-h-screen px-4 py-16 flex flex-col items-center bg-gradient-to-br from-[#0b1120] via-[#1f1408] to-[#020617] font-sans antialiased selection:bg-yellow-500/30 selection:text-yellow-200">
+    <div className="w-full h-100vh px-4 py-16 flex flex-col items-center bg-gradient-to-br from-[#0b1120] via-[#1f1408] to-[#020617] font-sans antialiased selection:bg-yellow-500/30 selection:text-yellow-200">
       
       {/* 1. HERO SECTION */}
       <div className="w-full max-w-5xl text-center mb-10 mt-10">
-        <h1 className="text-5xl md:text-6xl font-black text-white mb-4">
-          Search Your Journey
-        </h1>
-        <p className="text-gray-400 text-lg">
+        <p className="text-gray-400 text-lg sm:text-xl font-medium">
           Find buses, trains and flights for your next trip.
         </p>
       </div>
@@ -235,13 +242,13 @@ const Search = () => {
       </div>
 
       {/* 3. POPULAR ROUTES */}
-      <div className="w-full max-w-5xl mt-12">
-        <h2 className="text-2xl font-bold text-white mb-5">Popular Routes</h2>
-        <div className="grid md:grid-cols-2 gap-4">
+      <div className="w-full max-w-5xl mt-7 mb-10">
+        <h2 className="text-2xl font-bold text-white mb-8">Popular Routes</h2>
+        <div className="grid md:grid-cols-2 gap-4 ">
           <button
             onClick={() => {
-              setSource("Kolkata");
-              setDestination("Haldia");
+              setSource("kolkata");
+              setDestination("haldia");
             }}
             className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 text-left hover:border-yellow-500 transition"
           >
@@ -251,8 +258,8 @@ const Search = () => {
 
           <button
             onClick={() => {
-              setSource("Kolkata");
-              setDestination("Durgapur");
+              setSource("kolkata");
+              setDestination("durgapur");
             }}
             className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 text-left hover:border-yellow-500 transition"
           >
@@ -263,7 +270,7 @@ const Search = () => {
       </div>
 
       {/* 🚀 RESULTS SECTION */}
-      <div className="mt-12 w-full max-w-5xl pb-20">
+      <div ref={resultsRef} className="mt-12 w-full max-w-5xl pb-20 scroll-mt-12">
         
         {/* Loading Spinner */}
         {loading && (

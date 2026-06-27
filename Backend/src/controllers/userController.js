@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-// const bcrypt = require('bcrypt');
 const bcrypt = require('bcryptjs');
+const User = require('../models/User');
+const cloudinary = require("../utils/cloudinary");
 
-
+// Register user
 exports.registerUser = async (req, res) => {
     try{
         const {name, email, password, phone} = req.body;
@@ -37,7 +37,7 @@ exports.registerUser = async (req, res) => {
 
     }
 }
-
+// Login user
 exports.loginUser = async (req, res) =>{
     try{
         const {email,password} = req.body;
@@ -67,13 +67,57 @@ exports.loginUser = async (req, res) =>{
         res.status(200).json({
             message: 'Login successfully',
             token,
-            user:{
+            user: {
                 _id: user._id,
+                name: user.name,
                 email: user.email,
-                name: user.name
+                phone: user.phone,
+                profileImage: user.profileImage
             }
         });
     }catch(error){
         res.status(500).json({message: 'Something went wrong!', error: error.message});
     }
 }
+// Upload profile image
+exports.uploadProfileImage = async (req, res) => {
+    try {
+
+        // Check if file exists
+        if (!req.file) {
+            return res.status(400).json({
+                message: "Please select an image."
+            });
+        }
+
+        // Upload image to Cloudinary
+        const result = await cloudinary.uploader.upload(
+            `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+            {
+                folder: "OnePass/ProfileImages"
+            }
+        );
+
+        // Save image URL in database
+        const user = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                profileImage: result.secure_url
+            },
+            {
+                new: true
+            }
+        );
+
+        res.json({
+            message: "Profile image uploaded successfully",
+            profileImage: user.profileImage
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};

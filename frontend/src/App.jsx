@@ -10,6 +10,7 @@ import Register from "./pages/Registation";
 import History from "./pages/History";
 import { use } from "react";
 import ChatBot from "./components/ChatBot";
+import Profile from "./pages/Profile";
 
 function App() {
   const location  = useLocation();
@@ -33,6 +34,14 @@ function App() {
         <ProdectedRoute>
           <History />
        </ProdectedRoute>
+        }
+        />
+        <Route
+        path="/profile"
+        element={
+        <ProdectedRoute>
+          <Profile />
+        </ProdectedRoute>
         }
         />
     </Routes>

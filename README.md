@@ -120,6 +120,7 @@ JWT_SECRET=your_secret_key
 
 ## API Endpoints
 
+
 ### Authentication
 
 ```http

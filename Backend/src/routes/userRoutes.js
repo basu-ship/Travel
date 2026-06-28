@@ -3,7 +3,8 @@ const express = require("express");
 const {
     registerUser,
     loginUser,
-    uploadProfileImage
+    uploadProfileImage,
+    updateProfile
 } = require("../controllers/userController");
 
 // Middleware
@@ -20,12 +21,18 @@ router.post("/register", registerUser);
 // Login
 router.post("/login", loginUser);
 
-// Upload Profile Image
+// Upload profile image
 router.post(
     "/upload-profile",
     authMiddleware,
     upload.single("profileImage"),
     uploadProfileImage
+);
+// Update Profile
+router.put(
+    "/profile",
+    authMiddleware,
+    updateProfile
 );
 
 module.exports = router;

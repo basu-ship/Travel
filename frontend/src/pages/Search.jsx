@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef , useEffect} from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -14,6 +14,7 @@ const Search = () => {
   const [type, setType] = useState(typeFromURL || "bus");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sortBy, setSortBy] = useState("");
 
   // Passenger Modal States
   const [selectedTransport, setSelectedTransport] = useState(null);
@@ -33,6 +34,55 @@ const Search = () => {
     setSource(destination);
     setDestination(source);
   };
+  // Function to sort results based on selected option
+  const sortResults = (data, option) => {
+  const sorted = [...data];
+
+  switch (option) {
+    case "priceLow":
+      sorted.sort((a, b) => a.price - b.price);
+      break;
+
+    case "priceHigh":
+      sorted.sort((a, b) => b.price - a.price);
+      break;
+
+    case "rating":
+      sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      break;
+
+    case "departure":
+      sorted.sort((a, b) =>
+        (a.departureTime || "").localeCompare(b.departureTime || "")
+      );
+      break;
+
+    case "duration":
+      sorted.sort((a, b) => {
+        const getMinutes = (d) => {
+          if (!d) return 0;
+
+          const match = d.match(/(\d+)h\s*(\d+)m/);
+
+          if (!match) return 0;
+
+          return parseInt(match[1]) * 60 + parseInt(match[2]);
+        };
+
+        return getMinutes(a.duration) - getMinutes(b.duration);
+      });
+      break;
+
+    default:
+      break;
+  }
+
+  return sorted;
+};
+useEffect(() => {
+  if (results.length === 0) return;
+  setResults(prev => sortResults(prev, sortBy));
+}, [sortBy]);
 
   // 🔍 Search
   const handleSearch = async () => {
@@ -47,7 +97,8 @@ const Search = () => {
         `http://localhost:5000/api/transports/search?source=${source}&destination=${destination}&type=${type}`
       );
 
-      setResults(res.data.transports || res.data.results || res.data || []);
+      const transportData = res.data.transports || res.data.results || res.data || [];
+      setResults(sortResults(transportData, sortBy));
 
       // 🚀 SMOOTH SCROLL TO RESULTS CONTAINER
       setTimeout(() => {
@@ -64,7 +115,7 @@ const Search = () => {
     }
   };
 
-  // 🎫 Booking
+  // Booking
   const handleBooking = async (transport) => {
     try {
       const token = localStorage.getItem("token");
@@ -269,6 +320,38 @@ const Search = () => {
         </div>
       </div>
 
+      <div className="w-full max-w-5xl mt-8 flex justify-end">
+  <select
+    value={sortBy}
+    onChange={(e) => setSortBy(e.target.value)}
+    className="bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white outline-none"
+  >
+    <option value="" className="bg-[#0b1120]">
+      Sort By
+    </option>
+
+    <option value="priceLow" className="bg-[#0b1120]">
+      Price: Low → High
+    </option>
+
+    <option value="priceHigh" className="bg-[#0b1120]">
+      Price: High → Low
+    </option>
+
+    <option value="rating" className="bg-[#0b1120]">
+      Rating
+    </option>
+
+    <option value="departure" className="bg-[#0b1120]">
+      Departure Time
+    </option>
+
+    <option value="duration" className="bg-[#0b1120]">
+      Duration
+    </option>
+  </select>
+</div>
+
       {/* 🚀 RESULTS SECTION */}
       <div ref={resultsRef} className="mt-12 w-full max-w-5xl pb-20 scroll-mt-12">
         
@@ -299,34 +382,83 @@ const Search = () => {
                 className="p-6 rounded-2xl backdrop-blur-md bg-white/[0.04] border border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 transition-all duration-300 hover:bg-white/[0.07] hover:border-white/20 hover:-translate-y-0.5"
               >
                 {/* LEFT INFO */}
-                <div className="space-y-1">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 uppercase tracking-wider">
-                    {item.type || item.transportType}
-                  </span>
-                  <h3 className="text-xl font-bold text-white tracking-tight mt-1">
-                    {item.source} <span className="text-yellow-500 font-normal mx-1">→</span> {item.destination}
-                  </h3>
-                  <div className="flex items-center gap-2 text-sm text-gray-400">
-                    <span>⏱</span>
-                    <span>Estimated travel time</span>
-                  </div>
-                </div>
+                <div className="flex-1">
+
+  <div className="flex items-center gap-2 mb-2">
+    <span className="px-2 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs uppercase">
+      {item.type}
+    </span>
+
+    <span className="text-white font-semibold">
+      {item.operator}
+    </span>
+  </div>
+
+  <h3 className="text-xl font-bold text-white ">
+    {item.source}
+    <span className="text-yellow-500 mx-2">→</span>
+    {item.destination}
+  </h3>
+
+  <div className="mt-3 flex flex-wrap gap-6 text-sm text-gray-300">
+
+    <p>
+      🕒 Departure:
+      <span className="text-white ml-1">
+        {item.departureTime}
+      </span>
+    </p>
+
+    <p>
+      🕓 Arrival:
+      <span className="text-white ml-1">
+        {item.arrivalTime}
+      </span>
+    </p>
+
+    <p>
+      ⌛ Duration:
+      <span className="text-white ml-1">
+        {item.duration}
+      </span>
+    </p>
+
+    <p>
+      💺 Seats:
+      <span className="text-white ml-1">
+        {item.availableSeats}
+      </span>
+    </p>
+
+    <p>
+      ⭐ {item.rating}
+    </p>
+
+  </div>
+
+</div>
 
                 {/* RIGHT PRICING & ACTION */}
-                <div className="flex sm:flex-col justify-between sm:justify-center items-center sm:items-end w-full sm:w-auto pt-4 sm:pt-0 border-t border-white/5 sm:border-none">
-                  <div className="text-left sm:text-right mb-0 sm:mb-2">
-                    <span className="text-xs text-gray-400 block uppercase tracking-wider font-medium">Fare</span>
-                    <span className="text-2xl font-black text-yellow-400 tracking-tight">
-                      ₹{item.price}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => setSelectedTransport(item)}
-                    className="bg-white/10 hover:bg-yellow-500 text-white hover:text-black border border-white/10 hover:border-transparent px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 transform active:scale-95"
-                  >
-                    Book Now
-                  </button>
-                </div>
+<div className="flex flex-col items-end gap-3">
+
+  <div className="text-right">
+    <p className="text-gray-400 text-sm">
+      {item.class}
+    </p>
+
+    <h2 className="text-3xl font-bold text-yellow-400">
+      ₹{item.price}
+    </h2>
+  </div>
+
+  <button
+    onClick={() => setSelectedTransport(item)}
+    className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 rounded-xl font-bold transition"
+  >
+    Book Now
+  </button>
+
+</div>
               </div>
             ))}
           </div>

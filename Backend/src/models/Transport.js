@@ -1,41 +1,63 @@
 const mongoose = require('mongoose');
 
 const transportSchema = new mongoose.Schema({
-    type :{
+    type: {
         type: String,
         enum: ['bus', 'train', 'flight', 'car'],
         required: true,
     },
-    source:{
+
+    operator: {
+        type: String
+    },
+
+    source: {
         type: String,
         required: true,
     },
-    destination:{
+
+    destination: {
         type: String,
         required: true,
     },
-    departureTime :{
+
+    departureTime: {
         type: String,
-        required: true, 
+        required: true,
     },
+
+    arrivalTime: {
+        type: String,
+        required: true,
+    },
+
+    duration: {
+        type: String
+    },
+
     journeyDate: {
-    type: Date,
-    required: true,
-    },
-    arrivalTime : {
-        type: String,
+        type: Date,
         required: true,
     },
-    price:{
+
+    price: {
         type: Number,
     },
-    class:{
+
+    class: {
         type: String,
     },
-},
-    {
-        timestamps: true,
-    }
-);
 
-module.exports = mongoose.model('Transport', transportSchema);
+    availableSeats: {
+        type: Number,
+    },
+
+    rating: {
+        type: Number,
+        default: 4.5,
+    }
+
+}, {
+    timestamps: true,
+});
+module.exports = mongoose.model("Transport", transportSchema);

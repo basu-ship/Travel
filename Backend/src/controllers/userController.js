@@ -121,3 +121,30 @@ exports.uploadProfileImage = async (req, res) => {
         });
     }
 };
+// Update Profile
+exports.updateProfile = async (req, res) => {
+    try {
+        const { name, phone } = req.body;
+
+        const user = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                name,
+                phone
+            },
+            {
+                new: true
+            }
+        );
+
+        res.status(200).json({
+            message: "Profile updated successfully",
+            user
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};

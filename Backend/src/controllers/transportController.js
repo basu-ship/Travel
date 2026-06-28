@@ -1,21 +1,55 @@
 const Transport = require('../models/Transport');
 const axios = require('axios');
+const {generateTransport} = require('../../seed/transportGenerator')
 
 exports.searchAllTransports = async (req, res) => {
     try {
-        const { source, destination } = req.query;
+        const { source, destination, type } = req.query;
 
-        if (!source || !destination) {
+        if (type === "flight" && sourceCode && destinationCode) {
             return res.status(400).json({
                 message: 'Source and destination are required'
             });
         }
 
         // DB results (bus/train)
-        const dbResults = await Transport.find({
-            source: { $regex: source, $options: 'i' },
-            destination: { $regex: destination, $options: 'i' }
-        });
+        const query = {
+            source: { $regex: `^${source}$`, $options: "i" },
+            destination: { $regex: `^${destination}$`, $options: "i" }
+        };
+
+        if (type && type !== "flight") {
+             query.type = type;
+            }
+
+        let dbResults = await Transport.find(query);
+        // Generate more transports if very few exist
+if (
+    type !== "flight" &&
+    dbResults.length < 10
+) {
+
+    const newRecords = [];
+
+    const need = 10 - dbResults.length;
+
+    for (let i = 0; i < need; i++) {
+
+        newRecords.push(
+            generateTransport(
+                type,
+                source,
+                destination
+            )
+        );
+
+    }
+
+    await Transport.insertMany(newRecords);
+
+    dbResults = await Transport.find(query);
+
+}
 
         // Airport code mapping
         const airportCodes = {

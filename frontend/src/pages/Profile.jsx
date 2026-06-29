@@ -38,7 +38,7 @@ const handleSaveChanges = async () => {
       formData.append("profileImage", selectedImage);
 
       const uploadRes = await axios.post(
-        "http://localhost:5000/api/users/upload-profile",
+        "https://onepass-backend.onrender.com/api/users/upload-profile",
         formData,
         {
           headers: {
@@ -53,7 +53,7 @@ const handleSaveChanges = async () => {
 
     // Update name & phone
     const res = await axios.put(
-      "http://localhost:5000/api/users/profile",
+      "https://onepass-backend.onrender.com/api/users/profile",
       {
         name,
         phone,

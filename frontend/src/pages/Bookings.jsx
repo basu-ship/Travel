@@ -11,7 +11,7 @@ const Bookings = () => {
   const fetchBookings = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/bookings", {
+      const res = await axios.get("https://onepass-backend.onrender.com/api/bookings", {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -30,7 +30,7 @@ const Bookings = () => {
       const token = localStorage.getItem("token");
 
       await axios.delete(
-        `http://localhost:5000/api/bookings/${bookingId}`,
+        `https://onepass-backend.onrender.com/api/bookings/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`

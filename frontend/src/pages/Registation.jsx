@@ -16,7 +16,7 @@ const Register = () => {
         return;
     }
     try {
-      await axios.post("http://localhost:5000/api/users/register", {
+      await axios.post("https://onepass-backend.onrender.com/api/users/register", {
         name,
         email,
         phone,

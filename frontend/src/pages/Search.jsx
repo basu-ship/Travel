@@ -94,7 +94,7 @@ useEffect(() => {
       setLoading(true);
 
       const res = await axios.get(
-        `http://localhost:5000/api/transports/search?source=${source}&destination=${destination}&type=${type}`
+        `https://onepass-backend.onrender.com/api/transports/search?source=${source}&destination=${destination}&type=${type}`
       );
 
       const transportData = res.data.transports || res.data.results || res.data || [];
@@ -157,7 +157,7 @@ useEffect(() => {
           };
 
       await axios.post(
-        "http://localhost:5000/api/bookings",
+        "https://onepass-backend.onrender.com/api/bookings",
         bookingData,
         {
           headers: {

@@ -1,4 +1,14 @@
 {
+  "name": "travelling-backend",
+  "version": "1.0.0",
+  "description": "OnePass Backend",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "author": "Basudev Mondal",
+  "license": "ISC",
   "dependencies": {
     "amadeus": "^11.0.0",
     "axios": "^1.15.2",
@@ -10,6 +20,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.1",
     "multer": "^2.2.0",
+    "nodemon": "^3.1.14",
     "razorpay": "^2.9.6"
   }
 }

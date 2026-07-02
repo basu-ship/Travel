@@ -147,7 +147,7 @@ Travelling/
 │   │   ├── transportGenerator.js
 │   │   └── seedDatabase.js
 │   │
-│   ├── .env.example
+│   |
 │   └── package.json
 │
 └── README.md

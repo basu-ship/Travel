@@ -202,7 +202,6 @@ This script automatically creates **10,000+ transport records** for buses, train
 Create a `.env` file inside **Backend/**
 
 ```env
-PORT=5000
 
 MONGO_URI=your_mongodb_connection_string
 
